@@ -284,10 +284,14 @@ function createapikeyAsync(r) {
                     r.log("createapikeyAsync(): Existing Maximo API Key apikeytokenid = " + response_getmaximoapikey.member[0].apikeytokenid);
                     // modify the href to use apikeytokenid number at the end of URL and assign to NGINX variable:
                     var apikeytokenid = response_getmaximoapikey.member[0].apikeytokenid;
-                    var href = response_getmaximoapikey.member[0].href;
+                    var href = response_getmaximoapikey.member[0].href;                    
                     var segments = href.split("/");
                     segments[segments.length - 1] = "" + apikeytokenid;
-                    r.variables.maximoapikeyref = segments.join("/");   // assign NGINX variable - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
+                    var tmpUrl = segments.join("/");
+                    r.log("createapikeySync():/getmaximoapikey - tmpUrl = " + tmpUrl);
+                    var apiUrl = tmpUrl.replace (/(https?:\/\/)(.*?)(\/.*)/g, '$1' + 'maximo_api_server' + '$3');
+                    r.log("createapikeySync():/getmaximoapikey - Changed hostname to maximo_api_server in href  = " + apiUrl);
+                    r.variables.maximoapikeyref = apiUrl; // assign NGINX variable with modified href URL for /deletemaximoapikey location.                                  
                     //r.variables.maximoapikeyref = "http://maximo-project2.vip.iwater.ie/maxrest/oslc/os/IWMWMGENAPIKEYTOKEN/".concat(apikeytokenid); // assign NGINX variable - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
                     r.log("createapikeyAsync(): r.variables.maximoapikeyref = " + r.variables.maximoapikeyref);
                     r.headersOut.maximoapikeyref = segments.join("/"); // assign HTTP response header - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
@@ -461,8 +465,12 @@ function createapikeySync(r) {
                         var href = response.member[0].href;
                         var segments = href.split("/");
                         segments[segments.length - 1] = "" + apikeytokenid;
-                        r.variables.maximoapikeyref = segments.join("/");   // assign NGINX variable - due to Maximo APIKEY Table constraint, only a single key can exist in the array.                    
-                        r.log("createapikeySync():/getmaximoapikey - r.variables.maximoapikeyref = " + r.variables.maximoapikeyref);
+                        var tmpUrl = segments.join("/");
+                        r.log("createapikeySync():/getmaximoapikey - tmpUrl = " + tmpUrl);
+                        var apiUrl = tmpUrl.replace (/(https?:\/\/)(.*?)(\/.*)/g, '$1' + 'maximo_api_server' + '$3');
+                        r.log("createapikeySync():/getmaximoapikey - Changed hostname to maximo_api_server in href  = " + apiUrl);
+                        r.variables.maximoapikeyref = apiUrl; // assign NGINX variable with modified href URL for /deletemaximoapikey location.
+                        r.log("createapikeySync():/getmaximoapikey - NGINX variable r.variables.maximoapikeyref = " + r.variables.maximoapikeyref);
                         deleteflag = 1;   // There is an existing apikey to be deleted.
                         r.log("createapikeySync():/getmaximoapikey - Maximo apikey EXISTS in response from subrequest " + reply.uri + " " + reply.status.toString() + " " + reply.responseBody);
                         return deleteflag;
@@ -485,7 +493,7 @@ function createapikeySync(r) {
                 r.subrequest('/deletemaximoapikey', {method: 'DELETE', body: ''})
                     .then(reply => {
                         r.log("createapikeySync():/deletemaximoapikey - response from subrequest " + reply.uri + ", reply.status =  " + reply.status.toString() + ", reply.responseBody =  " + reply.responseBody + ", r.headersIn.MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID']);
-                        if (reply.status != 200) {
+                        if (reply.status != 200 && reply.status != 204) {
                             r.log("createapikeySync():/deletemaximoapikey - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
                             throw new Error("createapikeySync():/deletemaximoapikey - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
                             r.return(reply.status, reply.responseBody, "subrequest /deletemaximoapikey failed.");
@@ -497,7 +505,7 @@ function createapikeySync(r) {
                         r.log("createapikeySync(): calling sub request /createmaximoapikey_admin....." + " MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID']);
                         r.subrequest('/createmaximoapikey_admin', {method: 'POST', body: ''})
                             .then(reply => {
-                                if (reply.status != 200) {
+                                if (reply.status != 200 && reply.status != 201) {
                                     r.log("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
                                     throw new Error("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
                                     r.return(reply.status, reply.responseBody, "subrequest /createmaximoapikey_admin failed.");
@@ -536,7 +544,7 @@ function createapikeySync(r) {
                 r.log("createapikeySync(): calling sub request /createmaximoapikey_admin..... deleteflag = " + deleteflag + " MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID']);
                 r.subrequest('/createmaximoapikey_admin', {method: 'POST', body: ''})
                     .then(reply => {
-                        if (reply.status != 200) {
+                        if (reply.status != 200 && reply.status != 201) {
                             r.log("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
                             throw new Error("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
                             r.return(reply.status, reply.responseBody, "subrequest /createmaximoapikey_admin failed.");
@@ -584,8 +592,12 @@ function deleteapikeySync(r) {
                     var href = response.member[0].href;
                     var segments = href.split("/");
                     segments[segments.length - 1] = "" + apikeytokenid;
-                    r.variables.maximoapikeyref = segments.join("/");   // assign NGINX variable - due to Maximo APIKEY Table constraint, only a single key can exist in the array.                    
-                    r.log("deleteapikeySync():/getmaximoapikey - r.variables.maximoapikeyref = " + r.variables.maximoapikeyref);
+                    var tmpUrl = segments.join("/");
+                    r.log("createapikeySync():/getmaximoapikey - tmpUrl = " + tmpUrl);
+                    var apiUrl = tmpUrl.replace (/(https?:\/\/)(.*?)(\/.*)/g, '$1' + 'maximo_api_server' + '$3');
+                    r.log("createapikeySync():/getmaximoapikey - Changed hostname to maximo_api_server in href  = " + apiUrl);
+                    r.variables.maximoapikeyref = apiUrl; // assign NGINX variable with modified href URL for /deletemaximoapikey location.
+                    r.log("createapikeySync():/getmaximoapikey - NGINX variable r.variables.maximoapikeyref = " + r.variables.maximoapikeyref);
                     deleteflag = 1;   // There is an existing apikey to be deleted.
                     r.log("deleteapikeySync():/getmaximoapikey - Maximo apikey EXISTS in response from subrequest " + reply.uri + " " + reply.status.toString() + " " + reply.responseBody);
                     return deleteflag;
@@ -645,10 +657,14 @@ function deleteapikeyAsync(r) {
                     href = response_getmaximoapikey.member[0].href;
                     var segments = href.split("/");
                     segments[segments.length - 1] = "" + apikeytokenid;
-                    r.variables.maximoapikeyref = segments.join("/");   // assign NGINX variable - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
+                    var tmpUrl = segments.join("/");
+                    r.log("createapikeySync():/getmaximoapikey - tmpUrl = " + tmpUrl);
+                    var apiUrl = tmpUrl.replace (/(https?:\/\/)(.*?)(\/.*)/g, '$1' + 'maximo_api_server' + '$3');
+                    r.log("createapikeySync():/getmaximoapikey - Changed hostname to maximo_api_server in href  = " + apiUrl);
+                    r.variables.maximoapikeyref = apiUrl; // assign NGINX variable with modified href URL for /deletemaximoapikey location.
                     //r.variables.maximoapikeyref = "http://maximo-project2.vip.iwater.ie/maxrest/oslc/os/IWMWMGENAPIKEYTOKEN/".concat(apikeytokenid); // assign NGINX variable - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
                     r.log("deleteapikeyAsync(): r.variables.maximoapikeyref = " + r.variables.maximoapikeyref);
-                    r.headersOut.maximoapikeyref = segments.join("/"); // assign HTTP response header - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
+                    r.headersOut.maximoapikeyref = apiUrl; // assign HTTP response header - due to Maximo APIKEY Table constraint, only a single key can exist in the array.
                     r.log("deleteapikeyAsync(): r.headersOut.maximoapikeyref = " + r.headersOut.maximoapikeyref);
                     //
                     r.log("deleteapikeyAsync(): Test length > 0 for existing apikey to delete:  response_getmaximoapikey.member[0].apikeytokenid = " + response_getmaximoapikey.member[0].apikeytokenid);
