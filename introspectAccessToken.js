@@ -153,8 +153,8 @@ function validateAccessTokenCache(r) {
                                     } catch(error) {
                                         r.log("validateAccessTokenCache():/_oauth2_send_request - JSON Parse response error = " + error);                                        
                                         reply.status = 596;
-                                        r.return(reply.status, error + "\n" + "validateAccessTokenCache():/_oauth2_send_request reply.responseBody = " + reply.responseBody); // Error, return reply JSON string.                                      
-                                        throw new Error("validateAccessTokenCache():/_oauth2_send_request - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error); // Custom code error, stop NJS processing.
+                                        r.return(reply.status, error + "\n" + "validateAccessTokenCache():/_oauth2_send_request reply.responseBody = " + reply.responseBody); // Error, return reply JSON string.
+                                        throw new Error("validateAccessTokenCache():/_oauth2_send_request - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error); // Custom code error, stop NJS processing.
                                     }
                                     if (response.active == true) {
                                         r.log("validateAccessTokenCache(): JWT 200 response validation = true " + reply.uri + " " + reply.status.toString() + " " + reply.responseBody);
@@ -166,7 +166,7 @@ function validateAccessTokenCache(r) {
                                         } catch (error) {
                                             r.log("validateAccessTokenCache(): Error in response from function tokenResult() - " + error);
                                             r.return(596, "validateAccessTokenCache(): Error in response from function tokenResult().\n");
-                                            throw new Error("validateAccessTokenCache(): Error in response from function tokenResult(). MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", error =  " + error); // Custom code error, stop NJS processing.
+                                            throw new Error("validateAccessTokenCache(): Error in response from function tokenResult(). MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", error =  " + error); // Custom code error, stop NJS processing.
                                         }                                            
                                     } else {
                                         r.log("validateAccessTokenCache(): JWT 200 RESPONSE validation = false " + reply.uri + " " + reply.status.toString() + " " + reply.responseBody);
@@ -203,7 +203,7 @@ function validateAccessTokenCache(r) {
         } catch (error) {
             r.log("validateAccessTokenCache(): Error in response from function tokenResult() - " + error);
             r.return(500, "validateAccessTokenCache(): Error in response from function tokenResult().\n");
-            throw new Error("validateAccessTokenCache(): Error in response from function tokenResult(). MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", error =  " + error); // Custom code error, stop NJS processing.
+            throw new Error("validateAccessTokenCache(): Error in response from function tokenResult(). MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", error =  " + error); // Custom code error, stop NJS processing.
         }         
     }   // end of validateTokenFlag test block
 }
@@ -303,7 +303,7 @@ function createapikeyAsync(r) {
                     r.log("createapikeyAsync():/getmaximoapikey - JSON Parse response error = " + error);
                     reply.status = 596;                   
                     r.return(reply.status, error + "\n" + "createapikeyAsync():/getmaximoapikey reply.responseBody = " + reply.responseBody); // Error, return reply JSON string.
-                    throw new Error("createapikeyAsync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error); // Custom code error, stop NJS processing.
+                    throw new Error("createapikeyAsync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error); // Custom code error, stop NJS processing.
                 }
                 r.log("createapikeyAsync(): r.headersOut.SetCookie = " + r.headersOut.SetCookie);  // Check if WQebSphere is creating cookie for client browser.      
                 if (response_getmaximoapikey.member.length > 0) {
@@ -446,7 +446,7 @@ function _getapikey(r) {
                     r.log("_getapikey():/getmaximoapikey - JSON Parse response error = " + error);
                     reply.status = 596;
                     r.return(reply.status, error + "\n" + "_getapikey():/getmaximoapikey reply.responseBody = " + reply.responseBody); // Error, return reply JSON string.
-                    throw new Error("_getapikey():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error);  // Custom code error, stop NJS processing.
+                    throw new Error("_getapikey():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error);  // Custom code error, stop NJS processing.
                 }
                 r.log("_getapikey()/getmaximoapikey: r.headersOut.SetCookie = " + r.headersOut.SetCookie);  // Check if WQebSphere is creating cookie for client browser.      
                 if (response_getmaximoapikey.member.length > 0) {
@@ -462,7 +462,7 @@ function _getapikey(r) {
                 }
             } else {
                 r.log("_getapikey()/getmaximoapikey: Error in response from subrequest " + reply.uri + " " + reply.status.toString() + " " + reply.responseBody);
-                r.return(reply.status, reply.responseBody); // Error, return reply JSON string.                
+                r.return(reply.status, "_getapikey()/getmaximoapikey: Error in response from subrequest " + reply.uri + "\nreply.ResponseBody = " + reply.responseBody); // Error, return reply JSON string.               
             }
         } // end of function(reply) callback statement block
     ); // end of r.subrequest function
@@ -523,7 +523,7 @@ function createapikeySync(r) {
                     } catch(error) {
                         r.log("createapikeySync():/getmaximoapikey - JSON Parse response error = " + error);                        
                         reply_getmaximoapikey.status = 596; // make NGINX terminate processing.
-                        throw new Error("createapikeySync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error);
+                        throw new Error("createapikeySync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error);
                     }
                     if (response.member.length > 0 && response.member[0].apikeytokenid > 0) {
                         r.log("createapikeySync():/getmaximoapikey - Existing Maximo API Key JSON response = " + JSON.stringify(response));
@@ -592,7 +592,7 @@ function createapikeySync(r) {
                                     } catch(error) {
                                         r.log("createapikeySync():/createmaximoapikey_admin - JSON Parse response error = " + error);
                                         reply_createmaximoapikey_admin.status = 596;
-                                        throw new Error("createapikeySync():/createmaximoapikey_admin - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error);                                    
+                                        throw new Error("createapikeySync():/createmaximoapikey_admin - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error);
                                     }
                                     r.log("createapikeySync():/createmaximoapikey_admin Created APIKEY for USER: " + response_createapikey.userid + " - " + response_createapikey.apikey);
                                     r.variables.maximo_apikeys_cache = "{\"apikey\":\"" + response_createapikey.apikey + "\"}"; // Create Maximo Create API key response entry in token cache
@@ -638,7 +638,7 @@ function createapikeySync(r) {
                         r.log("createapikeySync():/createmaximoapikey_admin - response from subrequest " + reply.uri + ", reply.status =  " + reply.status.toString() + ", reply.responseBody =  " + reply.responseBody + ", r.headersIn.MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID']);
                         if (reply.status != 200 && reply.status != 201) {
                             r.log("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString());
-                            throw new Error("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody);
+                            throw new Error("createapikeySync():/createmaximoapikey_admin - subrequest failed for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", reply.responseBody = " + reply.responseBody);
                             //r.return(reply.status, reply.responseBody, "subrequest /createmaximoapikey_admin failed.");
                         } else {
                             r.log("createapikeySync():/createmaximoapikey_admin - response from subrequest " + reply.uri + ", reply.status =  " + reply.status.toString() + ", reply.responseBody =  " + reply.responseBody + ", r.headersIn.MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID']);                            
@@ -649,7 +649,7 @@ function createapikeySync(r) {
                             } catch(error) {
                                 r.log("createapikeySync():/createmaximoapikey_admin - JSON Parse response error = " + error);
                                 reply_createmaximoapikey_admin.status = 596;
-                                throw new Error("createapikeySync():/createmaximoapikey_admin - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error);                        
+                                throw new Error("createapikeySync():/createmaximoapikey_admin - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error);
                             }
                             r.log("createapikeySync():/createmaximoapikey_admin Created APIKEY for USER: " + response_createapikey.userid + " - " + response_createapikey.apikey);
                             r.variables.maximo_apikeys_cache = "{\"apikey\":\"" + response_createapikey.apikey + "\"}"; // Create Maximo Create API key response entry in token cache
@@ -662,7 +662,7 @@ function createapikeySync(r) {
                             } catch(error) {
                                 r.log("createapikeySync():/createmaximoapikey_admin - parse JSON NGINX cache error = " + error);                        
                                 reply_createmaximoapikey_admin.status = 596;
-                                throw new Error("createapikeySync():/createmaximoapikey_admin - parse JSON NGINX cache error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", r.variables.maximo_apikeys_cache = " + r.variables.maximo_apikeys_cache + ", JSON parse error =  " + error);                            
+                                throw new Error("createapikeySync():/createmaximoapikey_admin - parse JSON NGINX cache error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", r.variables.maximo_apikeys_cache = " + r.variables.maximo_apikeys_cache + ", JSON parse error =  " + error);
                             }
                             r.log("createapikeySync():/createmaximoapikey_admin Maximo api Keys NGINX CACHE response - payload = " + r.variables.maximo_apikeys_cache);
                             r.log("createapikeySync():/createmaximoapikey_admin Maximo API Keys NGINX CACHE response - apikey = " + apikeyscache_json.apikey);
@@ -705,7 +705,7 @@ function deleteapikeySync(r) {
                     } catch(error) {
                         r.log("deleteapikeySync():/getmaximoapikey - JSON Parse response error = " + error);
                         reply_getmaximoapikey.status = 596;
-                        throw new Error("deleteapikeySync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error);            
+                        throw new Error("deleteapikeySync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error);
                     }
                     if (response.member.length > 0 && response.member[0].apikeytokenid > 0) {
                         r.log("deleteapikeySync():/getmaximoapikey - Existing Maximo API Key JSON response = " + JSON.stringify(response));
@@ -785,7 +785,7 @@ function deleteapikeyAsync(r) {
                     r.log("deleteapikeyAsync():/getmaximoapikey - JSON Parse response error = " + error);
                     reply.status = 596;                   
                     r.return(reply.status, error + "\n" + "deleteapikeyAsync():/getmaximoapikey reply.responseBody = " + reply.responseBody); // Error, return reply JSON string.
-                    throw new Error("deleteapikeyAsync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", JSON parse error =  " + error); // Custom code error, stop NJS processing.
+                    throw new Error("deleteapikeyAsync():/getmaximoapikey - JSON Parse response error for MAXIMO-USER-ID = " + r.headersIn['MAXIMO-USER-ID'] + ", reply.status = " + reply.status.toString() + ", reply.responseBody = " + reply.responseBody + ", JSON parse error =  " + error); // Custom code error, stop NJS processing.
                 }
                 r.log("deleteapikeyAsync(): r.headersOut.SetCookie = " + r.headersOut.SetCookie);  // Check if WQebSphere is creating cookie for client browser.      
                 if (response_getmaximoapikey.member.length > 0) {
